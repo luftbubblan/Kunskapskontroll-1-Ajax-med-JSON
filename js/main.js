@@ -12,6 +12,15 @@ async function run() {
     $('#loadMoreBtn').on('click', async function() {
         limit += 10;
         loadedPokemons += 10;
+
+        //if 150 pokemons are loaded there is only one more left to load so varables change so that happens and the loadMoreBtn is removed
+        if(limit == 160) {
+            limit = 151;
+            loadedPokemons = 150;
+
+            $('#loadMoreBtn').remove();
+        }
+
         //appends 10 pokemons to the site by running loadPokemons with the data, and the previous numbers but 10 higher. ex 10-20 and then 20-30....
         $('#list').append(await loadPokemons(data, loadedPokemons, limit));
     })
@@ -21,6 +30,7 @@ async function run() {
 //fetches the 151 first pokemons and returns the data
 async function fetchfirstGen() {
     try {
+        //limit = the number of pokemons that is fetched
         const response = await fetch('https://pokeapi.co/api/v2/pokemon?limit=151');
         const data = await response.json();
 
@@ -157,4 +167,3 @@ $(document).on('click',function(event) {
 
 let output = "";
 run();
-
