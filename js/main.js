@@ -1,21 +1,20 @@
 async function run() {
-    let limit = 10;
     let loadedPokemons = 0;
+    let limit = 10;
 
     //fetches API with 151 pokemons and saves it to data
     const data = await fetchfirstGen();
 
-    //runs loadPokemons with the data and 0 pokemons on the site and telling it to print 10 new from 0 to 10
-    loadPokemons(data, loadedPokemons, limit);
-    
+    //appends 10 pokemons to the site by running loadPokemons with the data, 0 and 10
+    $('#list').append(await loadPokemons(data, loadedPokemons, limit));
+
     //click to load 10 more
-    $('#loadMoreBtn').on('click', function() {
+    $('#loadMoreBtn').on('click', async function() {
         limit += 10;
         loadedPokemons += 10;
-        //runs loadPolemons with the data and prints 10 more pokemons to the site. from the number it was before to 10 more. ex 10-20 and then 20-30....
-        loadPokemons(data, loadedPokemons, limit);
+        //appends 10 pokemons to the site by running loadPokemons with the data, and the previous numbers but 10 higher. ex 10-20 and then 20-30....
+        $('#list').append(await loadPokemons(data, loadedPokemons, limit));
     })
-    
 }
 
 
@@ -88,20 +87,8 @@ async function loadPokemons(data, loadedPokemons, limit) {
                 </div>
             </section>`
     }
-    //append new output(10 pokemons) to site
-    $('#list').append(output)
-
-    //click to expand for more info
-    $('.firstLink').on('click', function(event) {
-        event.preventDefault();
-        expandPokemon(event.target);
-    })
-
-    //click to see all moves
-    $('.secoundLink').on('click', function(event) {
-        event.preventDefault();
-        expandMoves(event.target);
-    })
+    //returns the output
+    return output  
 }
 
 
@@ -146,6 +133,22 @@ function capitalizeFirstLetter(string){
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
+
+//eventListner that handels both expands on click
+$(document).on('click',function(event) {
+    event.preventDefault();
+
+    //click pokemon to expand for more info
+    if($(event.target).hasClass('innerSection') || $(event.target).hasClass('stats') || $(event.target).is('h2') || $(event.target).is('img')) {
+        expandPokemon(event.target);
+
+    //click text to see all moves
+    } if($(event.target).is('b')) {
+        expandMoves(event.target);
+    }
+})
+
+
 /**
  * ##################################################################
  * #####THE CODE THAT IS RUN WHEN THE SITE IS LOADED STARTS HERE#####
@@ -154,3 +157,4 @@ function capitalizeFirstLetter(string){
 
 let output = "";
 run();
+

@@ -45,12 +45,6 @@ img {
     padding-top: 20px;
 }
 
-#searchSection {
-    border-bottom: 1px solid black;
-    padding: 20px 0;
-    text-align: center;
-}
-
 #loadMoreBtn {
     margin: 30px 0;
     width: 100px;
