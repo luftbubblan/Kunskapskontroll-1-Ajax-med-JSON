@@ -8,6 +8,9 @@ async function run() {
     //appends 10 pokemons to the site by running loadPokemons with the data, 0 and 10
     $('#list').append(await loadPokemons(data, loadedPokemons, limit));
 
+    //shows number of pokemons loaded out of 151
+    $('#counter').html(`<h2>Number of pokemons loaded: ${limit}/151</h2>`)
+
     //click to load 10 more
     $('#loadMoreBtn').on('click', async function() {
         limit += 10;
@@ -23,6 +26,9 @@ async function run() {
 
         //appends 10 pokemons to the site by running loadPokemons with the data, and the previous numbers but 10 higher. ex 10-20 and then 20-30....
         $('#list').append(await loadPokemons(data, loadedPokemons, limit));
+
+        //updates shows number of pokemons loaded out of 151
+        $('#counter').html(`<h2>Number of pokemons loaded: ${limit}/151</h2>`)
     })
 }
 
