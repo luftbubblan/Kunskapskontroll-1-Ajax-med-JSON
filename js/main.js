@@ -1,4 +1,5 @@
 async function run() {
+    //variables used to determine how many pokemons that are shown and that will be loaded
     let loadedPokemons = 0;
     let limit = 10;
 
@@ -9,10 +10,17 @@ async function run() {
     $('#list').append(await loadPokemons(data, loadedPokemons, limit));
 
     //shows number of pokemons loaded out of 151
-    $('#counter').html(`<h2>Number of pokemons loaded: ${limit}/151</h2>`)
+    $('#counter').html(`<h2>Number of pokemons shown: ${limit}/151</h2>`)
 
     //click to load 10 more
     $('#loadMoreBtn').on('click', async function() {
+        //hiddes the button and shows a loading text
+        $(this).toggleClass("hidden");
+        $("#loading").toggleClass("hidden");
+        //uncomment next line to simulate a slow loading API
+        // await new Promise(resolve => setTimeout(resolve, 3000));
+
+        //code that makes it so that loadPokemons function loads the next 10 pokemons
         limit += 10;
         loadedPokemons += 10;
 
@@ -28,28 +36,36 @@ async function run() {
         $('#list').append(await loadPokemons(data, loadedPokemons, limit));
 
         //updates shows number of pokemons loaded out of 151
-        $('#counter').html(`<h2>Number of pokemons loaded: ${limit}/151</h2>`)
+        $('#counter').html(`<h2>Number of pokemons shown: ${limit}/151</h2>`)
+
+        //shows the button and hiddes a loading text
+        $(this).toggleClass("hidden")
+        $("#loading").toggleClass("hidden");
     })
 }
 
 
 //fetches the 151 first pokemons and returns the data
 async function fetchfirstGen() {
+    const firstGenUrl = "https://pokeapi.co/api/v2/pokemon?limit=151"
     try {
-        //limit = the number of pokemons that is fetched
-        const response = await fetch('https://pokeapi.co/api/v2/pokemon?limit=151');
+        //limit = the number of pokemons that is fetched(151 pokemons in the first generation)
+        const response = await fetch(firstGenUrl);
         const data = await response.json();
 
         return data;
 
     } catch {
-        $('body').append(`
-        <h3>Something went wrong in the fetch</h3>
-        <p>Please try again at later state</p>
-    `);
+        $('#list').append(`
+            <div id="error">
+                <h3>Connection to server error</h3>
+                <p>Can not connect to "${firstGenUrl}"</p>
+            </div>
+        `);
+        $('#loadMoreBtn').toggleClass("hidden");
 
     } finally {
-        console.log("Finally-block");
+        console.log("Finally-block in runfetchfirstGen");
     }
 }
 
@@ -81,7 +97,7 @@ async function loadPokemons(data, loadedPokemons, limit) {
                 <a href="" class="firstLink">
                     <section class="innerSection">
                         <h2>${pokemonObject.id} ${capitalizeFirstLetter(data.results[i].name)}</h2>
-                        <img src="${pokemonObject.sprites.front_default}" alt="">
+                        <img class="pokemonImg" src="${pokemonObject.sprites.front_default}" alt="">
                         <div class="stats">
                             ${capitalizeFirstLetter(pokemonObject.stats[0].stat.name)}: ${pokemonObject.stats[0].base_stat}<br>
                             ${capitalizeFirstLetter(pokemonObject.stats[1].stat.name)}: ${pokemonObject.stats[1].base_stat}<br>
@@ -109,21 +125,24 @@ async function loadPokemons(data, loadedPokemons, limit) {
 
 
 //fetches a specific pokemons url to access more data about the pokemon and returns it
-async function fetchPokemonObject(url) {
+async function fetchPokemonObject(pokemonUrl) {
     try {
-        const response = await fetch(url);
+        const response = await fetch(pokemonUrl);
         const data = await response.json();
 
         return data;
 
     } catch {
-        $('body').append(`
-        <h3>Something went wrong in the fetch</h3>
-        <p>Please try again at later state</p>
+        $('#list').append(`
+            <div id="error">
+                <h3>Connection to server error</h3>
+                <p>Can not connect to "${pokemonUrl}"</p>
+            </div>
         `);
+        $('#loadMoreBtn').toggleClass("hidden");
         
     } finally {
-        console.log("Finally-block");
+        console.log("Finally-block in fetchPokemonObject");
     }
 }
 
@@ -151,24 +170,25 @@ function capitalizeFirstLetter(string){
 
 
 //eventListner that handels both expands on click
-$(document).on('click',function(event) {
-    event.preventDefault();
-
+$(document).on('click', function(event) {
+    
     //click pokemon to expand for more info
     if($(event.target).hasClass('innerSection') || $(event.target).hasClass('stats') || $(event.target).is('h2') || $(event.target).is('img')) {
+        event.preventDefault();
         expandPokemon(event.target);
-
-    //click text to see all moves
+        
+        //click text to see all moves
     } if($(event.target).is('b')) {
+        event.preventDefault();
         expandMoves(event.target);
     }
 })
 
 
 /**
- * ##################################################################
- * #####THE CODE THAT IS RUN WHEN THE SITE IS LOADED STARTS HERE#####
- * ##################################################################
+ * ##################################
+ * #####RUNNING CODE STARTS HERE#####
+ * ##################################
  */
 
 let output = "";
